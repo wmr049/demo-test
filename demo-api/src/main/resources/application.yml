@@ -1,0 +1,13 @@
+server:
+  port: 8082
+
+
+spring:
+  datasource:
+    url: jdbc:mysql://mysql:3306/qrcode_payment
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
