@@ -21,39 +21,37 @@ import static io.cucumber.junit.CucumberOptions.SnippetType.CAMELCASE;
 @CucumberOptions(
         features = {"src/test/resources/features/"},
         plugin = {"pretty", "html:target/cucumber.html"},
+        strict = true,
         snippets = CAMELCASE,
         tags = "not @ignore")
 public class CucumberComponentDemoTest {
 
-    private static final Logger log = LoggerFactory.getLogger(CucumberComponentQrcodeTest.class);
+  private static final Logger log = LoggerFactory.getLogger(CucumberComponentDemoTest.class);
 
-    public static final Integer WIREMOCK_PORT = 9090;
+  public static final Integer WIREMOCK_PORT = 9090;
 
-    public static final Integer API_PORT = 8080;
+  private CucumberComponentDemoTest() {}
 
-    private CucumberComponentDemoTest(){}
+  @ClassRule
+  public static final DockerComposeContainer<?> environment =
+          new DockerComposeContainer(new File("src/test/resources/docker-compose-demo.yml"))
+                  .waitingFor("wiremock", Wait.forHealthcheck())
+                  .withExposedService("wiremock_1", WIREMOCK_PORT)
+                  .withLocalCompose(true);
 
-    @ClassRule
-    public static final DockerComposeContainer<?> environment =
-            new DockerComposeContainer(new File("src/test/resources/docker-compose-qrcode.yml"))
-                    .waitingFor("wiremock", Wait.forHealthcheck())
-//                    .waitingFor("api", Wait.forHealthcheck())
-                    .withExposedService("wiremock_1", WIREMOCK_PORT)
-//                    .withExposedService("api_1", API_PORT)
-                    .withLocalCompose(true);
 
-    @BeforeClass
-    public static void buildUp() {
-        log.info("=== Starting Automated Tests ===");
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+  @BeforeClass
+  public static void buildUp() {
+    log.info("=== Starting Automated Tests ===");
+    TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 
-        final String wiremockHost = environment.getServiceHost("wiremock", WIREMOCK_PORT);
-        WireMock.configureFor(wiremockHost, WIREMOCK_PORT);
-    }
+    final String wiremockHost = environment.getServiceHost("wiremock", WIREMOCK_PORT);
+    WireMock.configureFor(wiremockHost, WIREMOCK_PORT);
+  }
 
-    @AfterClass
-    public static void tearDown() {
-        log.info("=== Automated Tests Finished ===");
-    }
+  @AfterClass
+  public static void tearDown() {
+    log.info("=== Automated Tests Finished ===");
+  }
 
 }
